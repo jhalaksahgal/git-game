@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export async function fetchPublicRepos(username) {
+export async function getUserinfo(username) {
     const url = `https://api.github.com/users/${encodeURIComponent(username)}`;
     const token = process.env.GITHUB_TOKEN;
     const response = await fetch(url, {
@@ -10,6 +10,7 @@ export async function fetchPublicRepos(username) {
             'Authorization': `token ${token}`,
         },
     });
+
     return response.ok;
 
 }
@@ -20,7 +21,7 @@ export async function GET(request) {
         const user = searchParams.get('user') ?? "";
         const page = process.env.page || "";
         if (user === "") return NextResponse.json({msg: "send some shit"});
-        const data = await fetchPublicRepos(user);
+        const data = await getUserinfo(user);
         return NextResponse.json({status: 200, success: data});
     } catch (err) {
         console.error(err); // Log the error for debugging
