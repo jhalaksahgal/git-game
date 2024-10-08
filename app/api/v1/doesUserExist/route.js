@@ -12,7 +12,6 @@ export async function getUserinfo(username) {
     });
 
     return response.ok;
-
 }
 
 export async function GET(request) {
