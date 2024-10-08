@@ -52,3 +52,8 @@ body {
   align-items: center;
   gap: 10px;
 }
+
+.shadowComplete {
+  box-shadow: -1px -5px 15px #00c0b6, 5px 5px 15px #00c0b6,
+    inset 5px 5px 10px #00c0b6, inset -5px -5px 10px #00c0b6;
+}
