@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 
 export default function LoginCard() {
@@ -26,7 +27,7 @@ export default function LoginCard() {
       <div className="Heading text-xl  font-bold text-center py-5 my-2">
         Login with your Github UserName
       </div>
-      <div className="inputField flex flex-col items-center justify-center gap-5  mx-5">
+      <div className="inputField flex flex-col items-center justify-center gap-5  mx-5 w-[80%] mx-auto">
         <div className="input1 w-full px-6">
           <div className="label text-sm font-bold w-full">Github UserName</div>
           <input
@@ -34,7 +35,7 @@ export default function LoginCard() {
             placeholder="Ivide thanne"
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
-            className="border-[1.5px] border-gray-500 p-2  rounded-xl my-2 w-full  bg-transparent "
+            className="border border-gray-500 p-2  rounded-md my-2 w-full  bg-transparent border-opacity-70 "
           />
         </div>
 
@@ -45,7 +46,7 @@ export default function LoginCard() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="College Email id"
-            className="border-[1.5px] border-gray-500 p-2  rounded-xl my-2 w-full bg-transparent"
+            className="border border-gray-500 p-2  rounded-xl my-2 w-full bg-transparent border-opacity-70"
           />
         </div>
         <div className="input1 w-full px-6">
@@ -55,7 +56,7 @@ export default function LoginCard() {
             value={realName}
             onChange={(e) => setRealName(e.target.value)}
             placeholder="Kimi no Na wa"
-            className="border-[1.5px] border-gray-500 p-2  rounded-xl my-2 w-full bg-transparent"
+            className="border border-gray-500 p-2  rounded-xl my-2 w-full bg-transparent border-opacity-70"
           />
         </div>
         <button
