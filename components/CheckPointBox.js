@@ -63,12 +63,22 @@ const middleCircle = (color) => {
   );
 };
 
-export default function CheckPointBox({ id, title, content, state, url }) {
+export default function CheckPointBox({
+  id,
+  title,
+  content,
+  state,
+  url,
+  trigger,
+  setTrigger,
+}) {
   // const [status, setStatus] = useState(state);
   const [loading, setLoading] = useState(false);
   const [color, setColor] = useState("#ffffff");
   const [error, setError] = useState("");
   const [isMarked, setIsMarked] = useState(false);
+  const [showCorrect, setShowCorrect] = useState(false);
+  const [showWrong, setShowWrong] = useState(false);
   useEffect(() => {
     if (state == "Completed") {
       setColor("#00C0B6");
@@ -89,21 +99,45 @@ export default function CheckPointBox({ id, title, content, state, url }) {
   const checkProgressHandler = async () => {
     setError("");
     setLoading(true);
-    try {
-      await axios
-        .get(url, {
-          params: {
-            user: localStorage.getItem("user"),
-            owner: process.env.OWNER,
-            repo: process.env.REPO,
-          },
-        })
-        .then((res) => {});
-    } catch (error) {
-      console.log(error);
-      setError("Error Sending a request to the server");
+    if (id === 6) {
+      // checking if user has marked all the above checkpoints
+      if (
+        localStorage.getItem("3_isMarked") === true &&
+        localStorage.getItem("4_isMarked") === true &&
+        localStorage.getItem("5_isMarked") === true
+      ) {
+        // code for axios request
+      } else {
+        setError("Error : Please complete the above checkpoints first");
+      }
+    } else {
+      try {
+        await axios
+          .get(url, {
+            params: {
+              user: localStorage.getItem("user"),
+              owner: process.env.OWNER,
+              repo: process.env.REPO,
+            },
+          })
+          .then((res) => {
+            console.log(res.data);
+            if (res.data.success === true && res.data.status === 200) {
+              setShowCorrect(true);
+              setLoading(false);
+              setError("");
+              setTrigger((trigger) => !trigger);
+            } else if (res.data.success === false && res.data.status === 200) {
+              setShowWrong(true);
+              setLoading(false);
+              setError("Error: Do it again");
+            }
+          });
+      } catch (error) {
+        console.log(error);
+        setError("Error Sending a request to the server");
+      }
     }
-    // await axios
   };
   return (
     <div className="h-[400px]  w-full p-3 px-10">
@@ -161,7 +195,7 @@ export default function CheckPointBox({ id, title, content, state, url }) {
                     <button
                       className="bg-[#038B40] text-white hover:bg-[#106b39] my-4 px-4 py-2 rounded-lg disabled:opacity-50"
                       onClick={checkProgressHandler}
-                      disabled={state === "Completed" || loading}
+                      disabled={showCorrect || loading || state === "Completed"}
                     >
                       Check Progress
                     </button>
@@ -182,9 +216,9 @@ export default function CheckPointBox({ id, title, content, state, url }) {
                     </button>
                   )}
                   {loading && <CheckLoader />}
-                  {state === "Completed" ||
+                  {showCorrect ||
                     (isMarked && <FaCircleCheck className="text-2xl" />)}
-                  {error && state === "Waiting" && (
+                  {showWrong && state === "Waiting" && (
                     <MdError className="text-3xl " />
                   )}
                 </div>
