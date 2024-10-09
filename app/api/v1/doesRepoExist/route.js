@@ -24,13 +24,10 @@ export async function fetchPublicRepos(username) {
 
 export async function GET(request) {
     try {
-        const header = headers()
         const {searchParams} = new URL(request.url);
-
         const user = searchParams.get('user') ?? "";
-        const id = header.get('id');
-
-        if (user === "" || id === null) return NextResponse.json({msg: "send some shit"}, {status: 400});
+        const id = 1;
+        if (user === "") return NextResponse.json({msg: "send some shit"}, {status: 400});
         const data = await fetchPublicRepos(user);
         const newRepos = data.filter((repo) => repo.name === `git-game_${user}`);
         if (newRepos.length === 1) {
