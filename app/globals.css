@@ -182,3 +182,8 @@ body {
     #060c13 100%
   );
 }
+
+ul {
+  list-style-type: disc;
+  line-height: 2;
+}
