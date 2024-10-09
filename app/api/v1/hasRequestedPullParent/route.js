@@ -1,10 +1,10 @@
 import {NextResponse} from "next/server";
 import {readDataMany, writeData} from "@/lib/db";
 
-export async function fetchMerges(owner, repo) {
+export async function fetchPulls(owner, repo) {
     const since = process.env.STARTING;
     const token = process.env.GITHUB_TOKEN;
-    const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${repo}/commits?since=${since}`;
+    const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${repo}/pulls?state=all&sort=created&direction=desc`;
     const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -15,18 +15,16 @@ export async function fetchMerges(owner, repo) {
     if (!response.ok) {
         throw new Error(`GitHub API responded with status ${response.status}: ${response.statusText}`);
     }
-    const commits = await response.json();
-    return commits.filter(commit => commit.parents.length > 1);
+    return await response.json()
 }
-
 export async function GET(request) {
     try {
-        const { searchParams }= new URL(request.url);
+        const {searchParams} = new URL(request.url);
+        const owner = process.env.OWNER;
+        const repo = process.env.PARENT_REPO;
         const user = searchParams.get('username') ?? "";
-        const repo = searchParams.get('repo') ?? "";
-        const id = 8;
-        if (user === "" || repo === "") return NextResponse.json({msg: "send some shit"});
-
+        const id = 9;
+        if (user === "" || repo === "") return NextResponse.json({repo:repo, msg: "send some shit"});
         const progress = await readDataMany({
             'collection': 'progress',
             query: {
@@ -35,29 +33,27 @@ export async function GET(request) {
             }
         })
         if (progress.length > 0) return NextResponse.json({status: 403, success: false, message: "Milestone already completed"}, {status: 403});
-        const data = await fetchMerges(user, repo);
-
-        const merges = data.filter((merge) => {
-            let d1 = new Date(merge.commit.author.date ?? "");
+        let pulls = await fetchPulls(owner, repo);
+        pulls = pulls.filter(pull => {
+            let d1 = new Date(pull.created_at ?? "");
             let d2 = new Date(process.env.STARTING)
-            return d1 > d2
+            return d1 > d2 && pull.user.login === user && pull.state === 'open';
         });
-        const success = merges.length > 0;
+        const success = pulls.length > 0;
         if (success) {
             await writeData({
                 collection: 'progress',
                 data: [{
                     identifier: id,
                     username: user,
-                    completedTime: merges[0].commit.author.date
+                    completedTime: pulls[0].created_at
                 }]
 
             })
         }
-        return NextResponse.json({status: 200, success: success, message: success ? "Ok" : "No Merge found"}, {status: 200});
-
+        return NextResponse.json({status: 200, success: success });
     } catch (err) {
-        console.error(err); // Log the error for debugging
-        return NextResponse.json({ success: false, message: 'Error: Internal Error', ErrorMsg: err?.toString() });
+        console.error(err);
+        return NextResponse.json({success: false, message: 'Error: Internal Error', ErrorMsg: err?.toString()});
     }
 }
