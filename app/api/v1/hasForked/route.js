@@ -24,7 +24,7 @@ export async function fetchPublicRepos(username) {
 export async function GET(request) {
     try {
         const { searchParams }= new URL(request.url);
-        const user = searchParams.get('user') ?? "";
+        const user = searchParams.get('username') ?? "";
         const page = process.env.PAGE || new URL(request.url).hostname;
         const id = 2;
         if (user === "") return NextResponse.json({msg: "send some shit"}, {status: 400});

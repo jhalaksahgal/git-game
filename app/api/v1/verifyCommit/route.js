@@ -68,9 +68,9 @@ const fetchDetails = async (url) => {
 export async function GET(request) {
     try {
         const {searchParams} = new URL(request.url);
-        const user = searchParams.get('user') ?? "";
+        const user = searchParams.get('username') ?? "";
         const repo = searchParams.get('repo') ?? "";
-        const owner = searchParams.get('owner') ?? "";
+        const owner = user;
         const branchName = `git-game_${owner}`;
         const since = process.env.STARTING;
         const fileUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${repo}/contents/?ref=${branchName}`;
