@@ -13,7 +13,7 @@ export async function GET(request) {
         let data = await readDataMany({
             "collection": 'milestones',
             query: {
-                'task': task,
+                'task': parseInt(task),
             }
         })
         const completedMilestones = await readDataMany({
