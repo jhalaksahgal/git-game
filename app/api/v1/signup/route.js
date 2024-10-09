@@ -9,6 +9,20 @@ export async function POST(request) {
         if (!(body.username && body.email && body.name)) {
             return NextResponse.json({status: 400, message: "Required Fields are missing"});
         }
+
+        const username = body.username;
+        const url = `https://api.github.com/users/${encodeURIComponent(username)}`;
+        const token = process.env.GITHUB_TOKEN;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/vnd.github.v3+json',
+                'Authorization': `token ${token}`,
+            },
+        });
+        if (!response.ok) {
+            return NextResponse.json({status: 404, success: false, message: "User not found"});
+        }
         const data = await readDataOne({
             'collection': 'users',
             query: {
