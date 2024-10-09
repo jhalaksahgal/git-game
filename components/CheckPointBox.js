@@ -3,6 +3,24 @@ import { RxTriangleLeft } from "react-icons/rx";
 import { IoIosGitNetwork } from "react-icons/io";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
+import { FaCircleCheck } from "react-icons/fa6";
+import axios from "axios";
+import { MdError } from "react-icons/md";
+
+function CheckLoader() {
+  return (
+    <div className="dot-spinner">
+      <div className="dot-spinner__dot"></div>
+      <div className="dot-spinner__dot"></div>
+      <div className="dot-spinner__dot"></div>
+      <div className="dot-spinner__dot"></div>
+      <div className="dot-spinner__dot"></div>
+      <div className="dot-spinner__dot"></div>
+      <div className="dot-spinner__dot"></div>
+      <div className="dot-spinner__dot"></div>
+    </div>
+  );
+}
 
 const middleCircle = (color) => {
   return (
@@ -46,7 +64,9 @@ const middleCircle = (color) => {
 
 export default function CheckPointBox({ id, title, content, state }) {
   // const [status, setStatus] = useState(state);
+  const [loading, setLoading] = useState(false);
   const [color, setColor] = useState("#ffffff");
+  const [error, setError] = useState("");
   useEffect(() => {
     if (state == "Complete") {
       setColor("#00C0B6");
@@ -55,14 +75,17 @@ export default function CheckPointBox({ id, title, content, state }) {
     }
     console.log(color);
   }, [state]);
+
   console.log(state);
-  const checkProgressHandler = () => {};
+  const checkProgressHandler = async () => {
+    setLoading(true);
+  };
   return (
     <div className="h-[400px]  w-full p-3 px-10">
       <div className="topbox  grid grid-cols-12 place-items-center">
         <div className="h-[35px] border-2 bg-transparent w-[35px] rounded-full "></div>
         <div
-          className={clsx("statusText text-3xl w-1/7 col-span-2 ", {
+          className={clsx("statusText text-3xl w-1/7 col-span-2 font-bold", {
             "text-[#00c0b6]": state === "Complete",
             "text-[#ff995e]": state === "Waiting",
           })}
@@ -97,43 +120,33 @@ export default function CheckPointBox({ id, title, content, state }) {
           <div className="title text-3xl font-bold">{title}</div>
 
           <div className="instructionCard  ">
-            <div class="bg-white w-full my-2  rounded-lg">
-              <div class="flex p-3 gap-1 py-3">
-                <div className="instructionLogo text-black font-bold flex gap-3 items-center">
+            <div className="bg-white w-full my-2  rounded-lg">
+              <div className="cardHeading  flex p-3 gap-1 py-3 shadow-2xl">
+                <div className="instructionLogo text-black font-bold flex gap-3 items-center ">
                   <IoIosGitNetwork />
                   <div className="">Instructions</div>
                 </div>
               </div>
-              <div class="cardContent text-black px-6 bg-[#E7E7E7] h-[200px]  overflow-scroll">
-                <div className="cardtext py-4">
-                  Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                  Omnis eligendi maiores itaque necessitatibus odit esse libero
-                  expedita reprehenderit hic officiis odio numquam soluta, iste
-                  minima error ipsa quis suscipit placeat nisi aliquam. Totam,
-                  quasi. Temporibus cumque sit molestiae. Mollitia, soluta
-                  obcaecati! Sit Lorem ipsum dolor sit amet consectetur
-                  adipisicing elit. Sapiente eius officia obcaecati officiis
-                  expedita repellat a omnis enim. Tenetur temporibus illo sunt,
-                  cumque corporis et nisi dolores perferendis vitae nemo
-                  voluptatibus unde aliquid suscipit ut vel. Veniam adipisci
-                  expedita maxime obcaecati nihil hic placeat debitis excepturi
-                  dolor? Aliquid autem repellat consequatur ipsum fuga voluptas!
-                  Perspiciatis, sequi asperiores repudiandae quidem inventore
-                  labore? Esse, harum consectetur sed commodi error, rem
-                  deserunt reprehenderit deleniti dicta accusantium, pariatur
-                  tempore! Asperiores, labore tempora quibusdam recusandae,
-                  dignissimos incidunt debitis atque in, sunt quas est magni
-                  quisquam molestias provident. Ea laboriosam unde eaque
-                  consequatur eveniet corrupti laborum.
-                </div>
+              <div className="cardContent text-black px-6 bg-[#E7E7E7] h-[200px]  overflow-scroll overflow-x-hidden rounded-b-xl">
+                <div className="cardtext py-4">{content}</div>
                 <div className="bottom flex gap-4 items-center">
                   <button
-                    className="bg-neutral-600 text-white hover:bg-neutral-500 my-4 px-4 py-2 rounded-lg"
+                    className="bg-[#038B40] text-white hover:bg-[#106b39] my-4 px-4 py-2 rounded-lg disabled:opacity-50"
                     onClick={checkProgressHandler}
+                    disabled={
+                      state === "Incomplete" || state === "Complete" || loading
+                    }
                   >
                     Check Progress
                   </button>
-                  <div className="circle w-2 bg-blue-500 h-2"></div>
+                  {loading && <CheckLoader />}
+                  {state === "Complete" && (
+                    <FaCircleCheck className="text-2xl" />
+                  )}
+                  {error && <MdError className="text-3xl " />}
+                </div>
+                <div className="errorLine text-red-500 font-semibold text-sm px-2 pb-4">
+                  {error}
                 </div>
               </div>
             </div>

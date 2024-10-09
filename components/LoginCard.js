@@ -1,25 +1,51 @@
 "use client";
 
+import axios from "axios";
+
 import { useState } from "react";
 
-export default function LoginCard() {
+export default function LoginCard({ setLoggedIn }) {
   const [errorMessage, setErrorMessage] = useState("This is an error message");
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [realName, setRealName] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleProceed = () => {
+  const handleProceed = async () => {
     if (userName === "" || email === "" || realName === "") {
       setErrorMessage("Please fill all the fields");
+      return;
     } else if (!email.includes("@iiitkottayam.ac.in")) {
       setErrorMessage("Please enter a valid IIIT Kottayam email");
+      return;
     } else if (userName.includes(" ")) {
       setErrorMessage("Username should not contain spaces");
+      return;
     } else {
       setErrorMessage("Proceeding");
       // checking if the user exist
+
+      try {
+        await axios
+          .get("/api/v1/doesUserExist?user=thisisanshrastogi")
+          .then((res) => {
+            console.log(res);
+            // This is a wrong way to check if the user exists
+            // This is just a dummy code
+            if (res.data.status === 200 && res.data.success === false) {
+              localStorage.setItem("user", userName);
+              localStorage.setItem("realName", realName);
+              setLoggedIn(true);
+
+              // Proceed to next step
+            }
+          });
+      } catch (error) {
+        setErrorMessage("User not found");
+      } finally {
+        setLoading(false);
+      }
     }
-    console.log("Called");
   };
   return (
     /* From Uiverse.io by adamgiebl */
@@ -29,7 +55,7 @@ export default function LoginCard() {
       </div>
       <div className="inputField flex flex-col items-center justify-center gap-5  mx-5 w-[80%] mx-auto">
         <div className="input1 w-full px-6">
-          <div className="label text-sm font-bold w-full">Github UserName</div>
+          <div className="label text-xs font-bold w-full">Github UserName</div>
           <input
             type="text"
             placeholder="Ivide thanne"
@@ -40,7 +66,7 @@ export default function LoginCard() {
         </div>
 
         <div className="input1 w-full px-6 ">
-          <div className="label text-sm font-bold w-full">College Email</div>
+          <div className="label text-xs font-bold w-full">College Email</div>
           <input
             type="text"
             value={email}
@@ -50,7 +76,7 @@ export default function LoginCard() {
           />
         </div>
         <div className="input1 w-full px-6">
-          <div className="label text-sm font-bold w-full">Your Real Name</div>
+          <div className="label text-xs font-bold w-full">Your Real Name</div>
           <input
             type="text"
             value={realName}
