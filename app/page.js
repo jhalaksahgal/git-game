@@ -11,12 +11,27 @@ export default function Home() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [startLoader, setStartLoader] = useState(false);
 
+  const logOut = () => {
+    setLoggedIn(false);
+    localStorage.clear();
+  };
+
   return (
     <div className="h-screen background ">
-      <div className="w-full flex justify-center">
-        <div className="logo w-[15%] h-[20%] my-2">
+      <div className=" flex justify-between  items-center ">
+        <div className="logo w-[15%] h-[20%] my-2 mx-2">
           <Image src={gdgLogo} alt="Unable to load the logo" />
         </div>
+        {loggedIn && (
+          <div className="Logout mx-4">
+            <button
+              onClick={logOut}
+              className="bg-transparent hover:bg-neutral-200 font-semibold hover:text-black border-[1.5px] border-neutral-200 text-white  my-4 px-4 py-2 rounded-lg disabled:opacity-50"
+            >
+              Log Out
+            </button>
+          </div>
+        )}
       </div>
 
       {!loggedIn && (

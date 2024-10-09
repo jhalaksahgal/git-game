@@ -19,7 +19,7 @@ export default function LoginCard({ setLoggedIn }) {
       setErrorMessage("Please enter a valid IIIT Kottayam email");
       return;
     } else if (userName.includes(" ")) {
-      setErrorMessage("Username should not contain spaces");
+      setErrorMessage("GitHub   Username should not contain spaces");
       return;
     } else {
       setErrorMessage("Proceeding");
