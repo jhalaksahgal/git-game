@@ -46,10 +46,10 @@ export async function GET(request) {
                     username: user,
                     completedTime: forkedRepo[0].created_at
                 }]
-
             })
         }
-        return NextResponse.json({status: 200, success: forkedRepo.length === 1});
+        const success =forkedRepo.length === 1
+        return NextResponse.json({status: 200, success: success, message: success ? "Ok" : "Not forked repo found on your profile"});
     } catch (err) {
         console.error(err); // Log the error for debugging
         return NextResponse.json({ success: false, message: 'Error: Internal Error', ErrorMsg: err?.toString()});
