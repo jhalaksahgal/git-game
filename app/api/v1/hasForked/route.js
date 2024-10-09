@@ -22,9 +22,11 @@ export async function fetchPublicRepos(username) {
 export async function GET(request) {
     try {
         const { searchParams }= new URL(request.url);
+
         const user = searchParams.get('user') ?? "";
         const page = process.env.PAGE || new URL(request.url).hostname;
-        if (user === "") return NextResponse.json({msg: "send some shit"});
+
+        if (user === "") return NextResponse.json({msg: "send some shit"}, {status: 400});
         const data = await fetchPublicRepos(user);
         return NextResponse.json({status: 200,  success: data.some((repo) => repo.homepage === page)});
     } catch (err) {

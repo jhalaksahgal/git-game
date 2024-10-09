@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
-import { headers } from 'next/headers'
+import {NextResponse} from "next/server";
+import {headers} from 'next/headers'
+import {writeData} from "@/lib/db";
 
 
 export async function fetchPublicRepos(username) {
@@ -24,13 +25,28 @@ export async function fetchPublicRepos(username) {
 export async function GET(request) {
     try {
         const header = headers()
-        const { searchParams }= new URL(request.url);
+        const {searchParams} = new URL(request.url);
+
         const user = searchParams.get('user') ?? "";
-        if (user === "") return NextResponse.json({msg: "send some shit"});
+        const id = header.get('id');
+
+        if (user === "" || id === null) return NextResponse.json({msg: "send some shit"}, {status: 400});
         const data = await fetchPublicRepos(user);
-        return NextResponse.json({status: 200, id:header.get('id'), success: data.some((repo) => repo.name === `git-game_${user}`)});
+        const newRepos = data.filter((repo) => repo.name === `git-game_${user}`);
+        if (newRepos.length === 1) {
+            await writeData({
+                collection: 'progress',
+                data: [{
+                    identifier: id,
+                    username: user,
+                    completedTime: newRepos[0].created_at
+                }]
+
+            })
+        }
+        return NextResponse.json({status: 200,success: newRepos.length === 1}, {status: 200});
     } catch (err) {
         console.error(err); // Log the error for debugging
-        return NextResponse.json({ success: false, message: 'Error: Internal Error', ErrorMsg: err?.toString() });
+        return NextResponse.json({success: false, message: 'Error: Internal Error', ErrorMsg: err?.toString()}, {status: 500});
     }
 }
