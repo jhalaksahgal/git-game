@@ -17,7 +17,7 @@ export async function getUserinfo(username) {
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const user = searchParams.get("username") ?? "";
+    const user = searchParams.get("user") ?? "";
     const page = process.env.page || "";
     if (user === "") return NextResponse.json({ msg: "send some shit" });
     const data = await getUserinfo(user);
