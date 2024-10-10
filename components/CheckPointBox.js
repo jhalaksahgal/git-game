@@ -181,7 +181,7 @@ export default function CheckPointBox({
         await axios
           .get(url, {
             params: {
-              username: localStorage.getItem("user"),
+              user: localStorage.getItem("user"),
               owner: process.env.OWNER,
               repo: process.env.REPO,
             },

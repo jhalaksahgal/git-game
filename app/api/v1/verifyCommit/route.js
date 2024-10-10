@@ -77,12 +77,11 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const user = searchParams.get("user") ?? "";
-    const repo = `git-game_${user}`;
+    const repo = `git-game`;
     // as repo name is fixed i.e. = git-game_<username> , we can construct it here using username
     // const repo = searchParams.get("repo") ?? "";
     const owner = searchParams.get("owner") ?? "";
-    const branchName = `git-game-branch`;
-    // const branchName = `git-game_${user}`;
+    const branchName = `git-game_${user}`;
     const since = process.env.STARTING;
 
     //changed the urls
