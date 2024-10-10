@@ -20,7 +20,7 @@ export async function fetchCommits(owner, repo) {
 export async function GET(request) {
     try {
         const { searchParams }= new URL(request.url);
-        const user = searchParams.get('user') ?? "";
+        const user = searchParams.get('username') ?? "";
         const repo = searchParams.get('repo') ?? "";
         const owner = searchParams.get('owner') ?? "";
         if (user === "" || repo === "") return NextResponse.json({msg: "send some shit"});

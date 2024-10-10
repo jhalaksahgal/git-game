@@ -47,7 +47,8 @@ export async function GET(request) {
     const data = await fetchPublicRepos(user);
 
     const newRepos = data.filter((repo) => repo.name === `git-game_${user}`);
-    if (newRepos.length === 1) {
+    const success = newRepos.length === 1;
+    if (success) {
       await writeData({
         collection: "progress",
         data: [
@@ -59,7 +60,6 @@ export async function GET(request) {
         ],
       });
     }
-    const success = newRepos.length === 1;
     return NextResponse.json(
       {
         status: 200,
