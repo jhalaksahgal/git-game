@@ -85,6 +85,9 @@ export default function CheckPointBox({
     } else if (state == "Waiting") {
       setColor("#FF995E");
     }
+    // if (localStorage.getItem(`${id}_isMarked`) === "true") {
+    //   setIsMarked(true);
+    // }
     console.log(color);
   }, [state]);
 
@@ -99,16 +102,79 @@ export default function CheckPointBox({
   const checkProgressHandler = async () => {
     setError("");
     setLoading(true);
+    setShowWrong(false);
+    setShowCorrect(false);
     if (id === 6) {
       // checking if user has marked all the above checkpoints
       if (
-        localStorage.getItem("3_isMarked") === true &&
-        localStorage.getItem("4_isMarked") === true &&
-        localStorage.getItem("5_isMarked") === true
+        localStorage.getItem("3_isMarked") === "true" &&
+        localStorage.getItem("4_isMarked") === "true" &&
+        localStorage.getItem("5_isMarked") === "true"
       ) {
         // code for axios request
+        console.log("Sending request");
+        try {
+          await axios
+            .get(url, {
+              params: {
+                user: localStorage.getItem("user"),
+                owner: process.env.NEXT_PUBLIC_OWNER,
+                repo: process.env.NEXT_PUBLIC_REPO,
+              },
+            })
+            .then((res) => {
+              console.log(res.data);
+              if (res.data.success === true && res.data.status === 200) {
+                setShowCorrect(true);
+                setLoading(false);
+                setError("");
+                setTrigger((trigger) => !trigger);
+              } else if (
+                res.data.success === false &&
+                res.data.status === 200 &&
+                res.data.branch === false
+              ) {
+                setShowWrong(true);
+                setLoading(false);
+                setError(`Error: Branch not found`);
+              } else if (
+                res.data.success === false &&
+                res.data.status === 200 &&
+                res.data.file === false
+              ) {
+                setShowWrong(true);
+                setLoading(false);
+                setError(`Error: File not found`);
+              } else if (
+                res.data.success === true &&
+                res.data.status === 200 &&
+                res.data.commit === false
+              ) {
+                setShowWrong(true);
+                setLoading(false);
+                setError(`Error: No commit found`);
+              } else if (
+                res.data.success === true &&
+                res.data.status === 200 &&
+                res.data.commit === true
+              ) {
+                setShowCorrect(true);
+                setLoading(false);
+                setError("");
+                setTrigger((trigger) => !trigger);
+              } else {
+                setShowWrong(true);
+                setLoading(false);
+                setError(`Error: ${res.data.msg}`);
+              }
+            });
+        } catch (error) {
+          console.error(error);
+          console.log("Axios Error");
+        }
       } else {
-        setError("Error : Please complete the above checkpoints first");
+        setLoading(false);
+        setError("Error : Complete the above checkpoints first");
       }
     } else {
       try {
@@ -123,14 +189,14 @@ export default function CheckPointBox({
           .then((res) => {
             console.log(res.data);
             if (res.data.success === true && res.data.status === 200) {
-              setShowCorrect(true);
+              // setShowCorrect(true);
               setLoading(false);
               setError("");
               setTrigger((trigger) => !trigger);
             } else if (res.data.success === false && res.data.status === 200) {
               setShowWrong(true);
               setLoading(false);
-              setError("Error: Do it again");
+              setError(`Error: ${res.data.message}`);
             }
           });
       } catch (error) {
@@ -195,7 +261,7 @@ export default function CheckPointBox({
                     <button
                       className="bg-[#038B40] text-white hover:bg-[#106b39] my-4 px-4 py-2 rounded-lg disabled:opacity-50"
                       onClick={checkProgressHandler}
-                      disabled={showCorrect || loading || state === "Completed"}
+                      disabled={loading || state === "Completed"}
                     >
                       Check Progress
                     </button>
@@ -216,11 +282,11 @@ export default function CheckPointBox({
                     </button>
                   )}
                   {loading && <CheckLoader />}
-                  {showCorrect ||
-                    (isMarked && <FaCircleCheck className="text-2xl" />)}
-                  {showWrong && state === "Waiting" && (
-                    <MdError className="text-3xl " />
+                  {(isMarked || state === "Completed") && (
+                    <FaCircleCheck className="text-2xl" />
                   )}
+
+                  {showWrong && <MdError className="text-3xl " />}
                 </div>
                 <div className="errorLine text-red-500 font-semibold text-sm px-2 pb-4">
                   {error}
